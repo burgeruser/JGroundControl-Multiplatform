@@ -1,0 +1,56 @@
+############################
+# Build tools / Gradle
+############################
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle local properties
+gradle-app.setting
+local.properties
+
+############################
+# Java / JVM
+############################
+*.class
+hs_err_pid*
+replay_pid*
+
+############################
+# IDEs / Editors
+############################
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+out/
+.factorypath
+
+############################
+# OS files
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# App artifacts / distributions
+############################
+*.log
+*.tar
+*.zip
+/dist/
+/release/
+
+############################
+# Local credentials or keys
+############################
+/*.pub
+
+############################
+# Packaging staging (if used)
+############################
+/build/appimage/
+/build/jpackage/
+
