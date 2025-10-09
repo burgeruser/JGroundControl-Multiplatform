@@ -1,0 +1,314 @@
+<configuration>
+    <!-- Logback configuration -->
+    <!-- Unified variables: log directory and pattern (with session MDC 'sid') -->
+    <property name="LOG_DIR" value="${LOG_DIR:-logs}"/>
+    <property name="LOG_PATTERN" value="%d{HH:mm:ss.SSS} %-5level [%thread] [sid:%X{sid:-default}] %logger{36} - %msg%n"/>
+    <!-- You can temporarily raise category levels with -DMAV_PARSED_LEVEL=INFO or -DMAP_LOG_LEVEL=INFO -->
+    <property name="MAV_PARSED_LEVEL" value="${MAV_PARSED_LEVEL:-WARN}"/>
+    <property name="MAP_LOG_LEVEL" value="${MAP_LOG_LEVEL:-WARN}"/>
+    
+    <!-- Console output -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- File output (daily rolling) - uses per-user data directory -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Enum hit log -->
+    <appender name="ENUM_HIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/enum_hit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/enum_hit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Map debug log -->
+    <appender name="MAP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/map.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/map.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!-- Link RX log (size+time rolling) -->
+    <appender name="LINK_RX_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/link_rx.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/link_rx.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC_LINK_RX" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>8192</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="LINK_RX_FILE" />
+    </appender>
+
+    <!-- Link TX log (size+time rolling) -->
+    <appender name="LINK_TX_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/link_tx.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/link_tx.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC_LINK_TX" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>8192</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="LINK_TX_FILE" />
+    </appender>
+
+    <!-- Parsed packet summary (daily rolling) -->
+    <appender name="MAV_PARSED_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/mav_parsed.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/mav_parsed.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC_MAV_PARSED" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>8192</queueSize>
+        <discardingThreshold>4096</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="MAV_PARSED_FILE" />
+    </appender>
+
+    <!-- Enum miss log -->
+    <appender name="ENUM_MISS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/enum_miss.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/enum_miss.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Dedicated debug log -->
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/debug.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Errors log file output -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+    
+    <!-- Root logger configuration -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+    
+    <!-- Custom logger configuration -->
+    <logger name="com.serialcomm" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </logger>
+    
+    <!-- Status page enum hit/miss separate files to avoid flooding app.log -->
+    <logger name="status.enum.hit" level="INFO" additivity="false">
+        <appender-ref ref="ENUM_HIT_FILE" />
+    </logger>
+    <logger name="status.enum.miss" level="INFO" additivity="false">
+        <appender-ref ref="ENUM_MISS_FILE" />
+    </logger>
+
+    <!-- Link-specific logs: RX/TX -->
+    <!-- Default WARN with sampling filters applied -->
+    <logger name="link.rx" level="WARN" additivity="false">
+        <appender-ref ref="ASYNC_LINK_RX" />
+    </logger>
+    <logger name="link.tx" level="WARN" additivity="false">
+        <appender-ref ref="ASYNC_LINK_TX" />
+    </logger>
+
+    <!-- Parsed summary: default WARN to avoid high IO; switch to INFO/DEBUG in UI for diagnostics -->
+    <logger name="mav.parsed" level="${MAV_PARSED_LEVEL}" additivity="false">
+        <appender-ref ref="ASYNC_MAV_PARSED" />
+    </logger>
+
+    <!-- Session-related logs: online status, capability probing (record only) -->
+    <logger name="session.online" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <logger name="session.capability" level="INFO" additivity="false">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CAP_FILE" />
+    </logger>
+
+    <!-- Dedicated debug channel (use on demand) -->
+    <logger name="com.serialcomm.debug" level="DEBUG" additivity="false">
+        <appender-ref ref="DEBUG_FILE" />
+    </logger>
+
+    <!-- PBF and map debug channels -->
+    <logger name="map.pbf" level="${MAP_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="ASYNC_MAP" />
+    </logger>
+    <logger name="map.render" level="${MAP_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="ASYNC_MAP" />
+    </logger>
+    <logger name="tile.http" level="${MAP_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="ASYNC_MAP" />
+    </logger>
+    <logger name="map.diag" level="${MAP_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="ASYNC_MAP" />
+    </logger>
+
+    <!-- Async wrapper for map logs -->
+    <appender name="ASYNC_MAP" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>8192</queueSize>
+        <discardingThreshold>4096</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="MAP_FILE" />
+    </appender>
+
+    <!-- Remark hit/miss logs (similar to enum) -->
+    <appender name="REMARK_HIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/remark_hit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/remark_hit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="REMARK_MISS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/remark_miss.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/remark_miss.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="status.remark.hit" level="INFO" additivity="false">
+        <appender-ref ref="REMARK_HIT_FILE" />
+    </logger>
+    <logger name="status.remark.miss" level="INFO" additivity="false">
+        <appender-ref ref="REMARK_MISS_FILE" />
+    </logger>
+
+    <!-- Parameter metadata hit/miss logs to aid diagnosing metadata coverage issues -->
+    <appender name="PARAM_META_HIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/parameters_hit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/parameters_hit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="PARAM_META_MISS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/parameters_miss.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/parameters_miss.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <logger name="params.meta.hit" level="INFO" additivity="false">
+        <appender-ref ref="PARAM_META_HIT" />
+    </logger>
+    <logger name="params.meta.miss" level="INFO" additivity="false">
+        <appender-ref ref="PARAM_META_MISS" />
+    </logger>
+
+    <logger name="javafx" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.fazecast" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- Suppressed exception aggregation (ErrorMonitor), aggregated every 10s, file-only -->
+    <appender name="SUPPRESSED_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/suppressed.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/suppressed.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.serialcomm.suppressed" level="WARN" additivity="false">
+        <appender-ref ref="SUPPRESSED_FILE" />
+    </logger>
+
+    <!-- Capability/version dedicated log (daily rolling) -->
+    <appender name="CAP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/capability.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/capability.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+</configuration>

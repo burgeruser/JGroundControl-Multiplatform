@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.serialcomm.controller.MainController">
+   <center>
+      <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab id="tabDebug" fx:id="tabDebug" text="%ui.main.tab.debug">
+            <content>
+                  <fx:include fx:id="debugTab" source="debug_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabProtocol" fx:id="tabProtocol" text="%ui.main.tab.protocol">
+            <content>
+                  <fx:include fx:id="protocolTabContent" source="protocol_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabMavlink" fx:id="tabMavlink" text="%ui.main.tab.mavlink">
+            <content>
+                  <fx:include fx:id="mavlinkTabContent" source="mavlink_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabInspector" fx:id="tabInspector" text="%ui.main.tab.inspector">
+            <content>
+                  <fx:include fx:id="inspectorTabContent" source="inspector_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabStatus" fx:id="tabStatus" text="%ui.main.tab.status">
+            <content>
+                  <fx:include fx:id="statusTabContent" source="status_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabVisual" fx:id="tabVisual" text="%ui.main.tab.visual">
+            <content>
+                  <fx:include fx:id="visualStatusTabContent" source="visual_status_tab.fxml" />
+            </content>
+          </Tab>
+          <Tab id="tabParams" fx:id="tabParams" text="%ui.params.tab">
+            <content>
+                  <fx:include fx:id="paramTabContent" source="param_tab.fxml" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel" text="%ui.main.status" />
+            <VBox spacing="2.0">
+               <children>
+                  <Label fx:id="byteCountLabel" text="%statusbar.bytes.format" />
+                  <Label fx:id="rxBandwidthLabel" text="%statusbar.bandwidth.rx.format" />
+                  <Label fx:id="txBandwidthLabel" text="%statusbar.bandwidth.tx.format" />
+               </children>
+            </VBox>
+            <Button fx:id="clearByteCountButton" mnemonicParsing="false" text="%ui.main.clear.stats" />
+            <Separator orientation="VERTICAL" />
+            <Label fx:id="onlineLabel" text="%ui.main.online" />
+            <Label fx:id="onlineValueLabel" text="-" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox spacing="10.0">
+               <children>
+                  <Label fx:id="transportLabel" text="%ui.main.transport">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="transportComboBox" minWidth="120.0" />
+                  <Label fx:id="languageLabel" text="%ui.main.language">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="languageComboBox" minWidth="120.0" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="timerPeriodLabel" text="%ui.main.timer.period">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="0.985781990521327" endY="0.7867298578199052" startX="0.06635071090047395" startY="0.7914691943127962">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color green="0.6380952596664429" blue="1.0" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                  </Label>
+                  <ComboBox fx:id="timerPeriodComboBox" minWidth="120.0" />
+                  <Label fx:id="logLevelLabel" text="%ui.main.loglevel">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="0.943127962085308" endY="0.19431279620853079" startX="0.4170616113744076" startY="0.8009478672985783">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color green="0.5714285969734192" blue="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="0.5314699623506302">
+                                 <color>
+                                    <Color red="0.41904762387275696" blue="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="1.0" blue="0.538095235824585" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                  </Label>
+                  <ComboBox fx:id="logLevelComboBox" minWidth="100.0" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox spacing="10.0">
+               <children>
+                  <Label fx:id="portLabel" text="%ui.main.port">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="portComboBox" minWidth="120.0" />
+                  <Button fx:id="refreshButton" minWidth="150.0" mnemonicParsing="false" text="%ui.main.refresh" />
+                  <Label fx:id="baudRateLabel" text="%ui.main.baudrate">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="baudRateComboBox" minWidth="150.0" />
+                  <Button fx:id="connectButton" minWidth="200.0" mnemonicParsing="false" text="%ui.main.connect">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Button>
+                  <Label fx:id="deviceLabel" text="%ui.main.device">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="deviceComboBox" minWidth="100.0" />
+                  
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+</BorderPane>

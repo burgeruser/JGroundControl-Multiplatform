@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Protocol analysis / active requests tab -->
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.serialcomm.controller.ProtocolTabController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+    <children>
+        <!-- Top: general settings -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <children>
+                <Label fx:id="gcsSysIdLabel" text="%ui.protocol.gcs.sysid" />
+                <TextField fx:id="gcsSysIdField" text="253" />
+                <Label fx:id="gcsCompIdLabel" text="%ui.protocol.gcs.compid" />
+                <TextField fx:id="gcsCompIdField" text="190" />
+                <Separator orientation="VERTICAL" />
+                <Label fx:id="targetSysIdLabel" text="%ui.protocol.target.sysid" />
+                <TextField fx:id="targetSysIdField" text="0" />
+                <Label fx:id="targetCompIdLabel" text="%ui.protocol.target.compid" />
+                <TextField fx:id="targetCompIdField" text="0" />
+                <Separator orientation="VERTICAL" />
+                <Label fx:id="versionLabel" text="%ui.protocol.version" />
+                <ComboBox fx:id="protoVersionCombo" />
+            </children>
+        </HBox>
+
+        <!-- Heartbeat controls -->
+        <TitledPane fx:id="heartbeatPane" expanded="true" text="%ui.protocol.heartbeat.section">
+            <content>
+                <VBox spacing="8">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Label fx:id="mavTypeLabel" text="%ui.protocol.mav.type" />
+                            <ComboBox fx:id="mavTypeCombo" editable="true" />
+                            <Label fx:id="autopilotLabel" text="%ui.protocol.autopilot" />
+                            <ComboBox fx:id="autopilotCombo" editable="true" />
+                            <Label fx:id="sysStateLabel" text="%ui.protocol.system.status" />
+                            <ComboBox fx:id="sysStateCombo" editable="true" />
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Label fx:id="baseModeLabel" text="%ui.protocol.base.mode" />
+                            <CheckBox fx:id="cbModeCustom" text="CUSTOM" />
+                            <CheckBox fx:id="cbModeTest" text="TEST" />
+                            <CheckBox fx:id="cbModeAuto" text="AUTO" />
+                            <CheckBox fx:id="cbModeGuided" text="GUIDED" />
+                            <CheckBox fx:id="cbModeStab" text="STABILIZE" />
+                            <CheckBox fx:id="cbModeHil" text="HIL" />
+                            <CheckBox fx:id="cbModeManual" text="MANUAL" />
+                            <CheckBox fx:id="cbModeArmed" text="ARMED" />
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Label fx:id="hbIntervalLabel" text="%ui.protocol.hb.interval" />
+                            <TextField fx:id="hbIntervalField" text="1000" />
+                            <Button fx:id="sendHeartbeatBtn" text="%ui.protocol.hb.send" />
+                            <ToggleButton fx:id="autoHeartbeatToggle" text="%ui.protocol.hb.auto" />
+                        </children>
+                    </HBox>
+                </VBox>
+            </content>
+        </TitledPane>
+
+        <!-- Capability/Version summary (read-only + copy) -->
+        <TitledPane fx:id="capabilityPane" expanded="true" text="%ui.protocol.capability.section">
+            <content>
+                <VBox spacing="8">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Label fx:id="capabilitySummaryLabel" text="%ui.protocol.capability.summary" />
+                            <Button fx:id="copyCapabilityBtn" text="%ui.protocol.capability.copy" />
+                        </children>
+                    </HBox>
+                    <TextArea fx:id="capabilitySummaryArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+                </VBox>
+            </content>
+        </TitledPane>
+
+        <!-- Data stream / parameter requests -->
+        <TitledPane fx:id="requestPane" expanded="true" text="%ui.protocol.request.section">
+            <content>
+                <VBox spacing="8">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Label fx:id="streamLabel" text="%ui.protocol.stream" />
+                            <ComboBox fx:id="streamIdCombo" editable="true" />
+                            <Label fx:id="streamRateLabel" text="%ui.protocol.stream.rate" />
+                            <TextField fx:id="streamRateField" text="10" />
+                            <Button fx:id="sendStreamReqBtn" text="%ui.protocol.stream.send" />
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <children>
+                            <Button fx:id="paramRequestBtn" text="%ui.protocol.param.request" />
+                            <Button fx:id="requestAutopilotVersionBtn" text="%ui.protocol.request.autopilot_version" />
+                            <Button fx:id="clearTxButton" text="%ui.protocol.tx.clear" />
+                        </children>
+                    </HBox>
+                </VBox>
+            </content>
+        </TitledPane>
+
+        <!-- Bottom output area -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <children>
+                <Label fx:id="protocolAnalysisLabel" text="%ui.protocol.analysis.area" />
+                <Separator orientation="HORIZONTAL" />
+            </children>
+        </HBox>
+        <TextArea fx:id="protocolTextArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+    </children>
+</VBox>

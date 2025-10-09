@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.serialcomm.controller.VisualStatusTabController" fx:id="rootPane">
+    <center>
+        <SplitPane fx:id="outerSplit" dividerPositions="0.333">
+            <items>
+                <SplitPane fx:id="leftSplit" orientation="VERTICAL" dividerPositions="0.4">
+                    <items>
+                        <VBox fx:id="leftTopBox" spacing="10.0" alignment="TOP_LEFT" minWidth="0.0" minHeight="0.0">
+                            <children>
+                                <StackPane fx:id="attitudePane" alignment="TOP_LEFT" prefHeight="300.0" prefWidth="520.0">
+                                    <children>
+                                        <Canvas fx:id="attitudeCanvas" width="520" height="300" />
+                                        <Label fx:id="hintLabel" text="" wrapText="true" maxWidth="Infinity" style="-fx-font-size: 13px; -fx-text-fill: black; -fx-padding: 6 8 6 8;" StackPane.alignment="BOTTOM_LEFT" visible="false" />
+                                        <Label fx:id="platformLabel" text="-" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: black; -fx-background-color: rgba(255,255,255,0.6); -fx-padding: 4 6 4 6;" StackPane.alignment="TOP_LEFT" />
+                                    </children>
+                                    <minWidth>0.0</minWidth>
+                                    <minHeight>0.0</minHeight>
+                                    <VBox.vgrow>ALWAYS</VBox.vgrow>
+                                </StackPane>
+                            </children>
+                            <padding>
+                                <Insets top="10" right="10" bottom="10" left="10" />
+                            </padding>
+                        </VBox>
+                        <ScrollPane fitToWidth="true" fx:id="bottomScroll">
+                            <content>
+                                <GridPane fx:id="grid" hgap="16" vgap="10">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10" />
+                                    </padding>
+                                </GridPane>
+                            </content>
+                        </ScrollPane>
+                    </items>
+                </SplitPane>
+                <StackPane fx:id="mapPlaceholder">
+                    <minWidth>0.0</minWidth>
+                    <minHeight>0.0</minHeight>
+                </StackPane>
+            </items>
+        </SplitPane>
+    </center>
+</BorderPane>
+

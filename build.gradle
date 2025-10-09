@@ -1,0 +1,103 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+repositories { mavenCentral() }
+
+javafx { version = '21'; modules = ['javafx.controls','javafx.fxml','javafx.swing'] }
+
+application { mainClass = 'com.serialcomm.App' }
+
+// Ensure non-modular packaging finds all deps via JAR manifest Class-Path
+tasks.named('jar') {
+    manifest {
+        attributes(
+            'Main-Class': 'com.serialcomm.App',
+            'Class-Path': configurations.runtimeClasspath.files.collect { it.name }.join(' ')
+        )
+    }
+}
+
+dependencies {
+    implementation files('libs/gcs-core-1.0.0.jar')
+    implementation files('libs/gcs-protocol-mavlink-1.0.0.jar')
+    implementation files('libs/gcs-map-1.0.0.jar')
+    implementation 'ch.qos.logback:logback-classic:1.4.14'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'com.fazecast:jSerialComm:2.10.4'
+    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
+
+    // Explicitly include JavaFX platform jars into runtimeClasspath so they are staged for jpackage
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    def javafxPlatform = os.isWindows() ? 'win' : (os.isMacOsX() ? 'mac' : 'linux')
+    implementation "org.openjfx:javafx-base:21:${javafxPlatform}"
+    implementation "org.openjfx:javafx-graphics:21:${javafxPlatform}"
+    implementation "org.openjfx:javafx-controls:21:${javafxPlatform}"
+    implementation "org.openjfx:javafx-fxml:21:${javafxPlatform}"
+    implementation "org.openjfx:javafx-swing:21:${javafxPlatform}"
+}
+
+run {
+    jvmArgs = ['-Dfile.encoding=UTF-8','--add-modules=javafx.controls,javafx.fxml']
+}
+
+// Optional: jpackage app-image like private repo
+def appVersion = '1.0.0'
+// Stage all runtime dependencies and main jar into a single input directory for jpackage
+tasks.register('stageApp', Copy) {
+    dependsOn 'build'
+    def inputDir = file("$buildDir/appimage/input")
+    doFirst {
+        if (inputDir.exists()) inputDir.deleteDir()
+        inputDir.mkdirs()
+    }
+    into inputDir
+    // main jar produced by this project
+    from("$buildDir/libs") { include 'JGroundControl.jar' }
+    // runtime dependencies (platform-specific JavaFX jars, slf4j/logback, sqlite, jSerialComm, etc.)
+    from(configurations.runtimeClasspath)
+}
+
+tasks.register('jpackageImage', Exec) {
+    dependsOn 'stageApp'
+    description = 'Create app-image using jpackage (requires JDK 21+ with jpackage)'
+    doFirst {
+        def jdkHome = System.getProperty('java.home')
+        def jpackageBin = org.gradle.internal.os.OperatingSystem.current().isWindows() ?
+                "$jdkHome/bin/jpackage.exe" : "$jdkHome/bin/jpackage"
+        def destDir = file("$buildDir/jpackage")
+        if (destDir.exists()) destDir.deleteDir(); destDir.mkdirs()
+        def args = ['--type','app-image',
+                '--name','JGroundControl',
+                '--app-version', appVersion,
+                '--dest', destDir.absolutePath,
+                '--input', "$buildDir/appimage/input",
+                '--main-jar','JGroundControl.jar',
+                '--main-class','com.serialcomm.App']
+        // For non-modular packaging, jpackage will include all files from --input
+        // into the app image. The launcher resolves classpath from these jars
+        // (no explicit --class-path option is supported by jpackage).
+        // On Windows, set icon if available; enable console; keep UTF-8
+        def os = org.gradle.internal.os.OperatingSystem.current()
+        if (os.isWindows()) {
+            def builtIco = file('build/resources/main/images/icon.ico')
+            def srcIco = file('src/main/resources/images/icon.ico')
+            def ico = builtIco.exists() ? builtIco : srcIco
+            if (ico.exists()) { args += ['--icon', ico.absolutePath] }
+            args += ['--win-console']
+            // Ensure JavaFX is available at runtime via module-path on Windows.
+            // IMPORTANT:
+            // - $APPDIR points to the "app" directory itself (where the jars live).
+            // - Do NOT append "\\app" again, otherwise it becomes app\\app and
+            //   modules like javafx.controls cannot be found.
+            // - Use short '-p' and space-separated '--add-modules' to avoid parsing issues.
+            args += ['--java-options', '-p $APPDIR']
+            args += ['--java-options', '--add-modules javafx.controls,javafx.fxml,javafx.swing']
+            args += ['--java-options', '-Dfile.encoding=UTF-8']
+        }
+        commandLine([jpackageBin] + args)
+    }
+}
