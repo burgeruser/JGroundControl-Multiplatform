@@ -32,7 +32,10 @@ dependencies {
 
     // Explicitly include JavaFX platform jars into runtimeClasspath so they are staged for jpackage
     def os = org.gradle.internal.os.OperatingSystem.current()
-    def javafxPlatform = os.isWindows() ? 'win' : (os.isMacOsX() ? 'mac' : 'linux')
+    def arch = System.getProperty('os.arch')
+    def javafxPlatform = os.isWindows() ? 'win' : 
+        (os.isMacOsX() ? (arch.contains('aarch64') ? 'mac-aarch64' : 'mac') : 
+        (os.isLinux() ? (arch.contains('aarch64') ? 'linux-aarch64' : 'linux') : 'linux'))
     implementation "org.openjfx:javafx-base:21:${javafxPlatform}"
     implementation "org.openjfx:javafx-graphics:21:${javafxPlatform}"
     implementation "org.openjfx:javafx-controls:21:${javafxPlatform}"
@@ -80,20 +83,47 @@ tasks.register('jpackageImage', Exec) {
         // For non-modular packaging, jpackage will include all files from --input
         // into the app image. The launcher resolves classpath from these jars
         // (no explicit --class-path option is supported by jpackage).
-        // On Windows, set icon if available; enable console; keep UTF-8
+        // Platform-specific configurations
         def os = org.gradle.internal.os.OperatingSystem.current()
         if (os.isWindows()) {
             def builtIco = file('build/resources/main/images/icon.ico')
             def srcIco = file('src/main/resources/images/icon.ico')
             def ico = builtIco.exists() ? builtIco : srcIco
             if (ico.exists()) { args += ['--icon', ico.absolutePath] }
-            args += ['--win-console']
             // Ensure JavaFX is available at runtime via module-path on Windows.
             // IMPORTANT:
             // - $APPDIR points to the "app" directory itself (where the jars live).
             // - Do NOT append "\\app" again, otherwise it becomes app\\app and
             //   modules like javafx.controls cannot be found.
             // - Use short '-p' and space-separated '--add-modules' to avoid parsing issues.
+            args += ['--java-options', '-p $APPDIR']
+            args += ['--java-options', '--add-modules javafx.controls,javafx.fxml,javafx.swing']
+            args += ['--java-options', '-Dfile.encoding=UTF-8']
+        } else if (os.isMacOsX()) {
+            // macOS specific configuration
+            def builtIco = file('build/resources/main/images/icon.icns')
+            def srcIco = file('src/main/resources/images/icon.icns')
+            def ico = builtIco.exists() ? builtIco : srcIco
+            if (ico.exists()) { 
+                args += ['--icon', ico.absolutePath] 
+            } else {
+                // Fallback to PNG if no ICNS available (jpackage will convert it)
+                def pngIco = file('src/main/resources/images/icon.png')
+                if (pngIco.exists()) { 
+                    args += ['--icon', pngIco.absolutePath] 
+                }
+            }
+            // macOS JavaFX module path configuration
+            args += ['--java-options', '-p $APPDIR']
+            args += ['--java-options', '--add-modules javafx.controls,javafx.fxml,javafx.swing']
+            args += ['--java-options', '-Dfile.encoding=UTF-8']
+        } else {
+            // Linux configuration
+            def builtIco = file('build/resources/main/images/icon.png')
+            def srcIco = file('src/main/resources/images/icon.png')
+            def ico = builtIco.exists() ? builtIco : srcIco
+            if (ico.exists()) { args += ['--icon', ico.absolutePath] }
+            // Linux JavaFX module path configuration
             args += ['--java-options', '-p $APPDIR']
             args += ['--java-options', '--add-modules javafx.controls,javafx.fxml,javafx.swing']
             args += ['--java-options', '-Dfile.encoding=UTF-8']

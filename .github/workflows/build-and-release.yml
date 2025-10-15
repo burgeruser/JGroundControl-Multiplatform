@@ -40,10 +40,22 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean stageApp jpackageImage
 
+      - name: Verify Windows build output
+        run: |
+          echo "=== Verifying Windows build output ==="
+          if (Test-Path "build/jpackage/JGroundControl") {
+            echo "✅ JGroundControl directory found"
+            Get-ChildItem -Path "build/jpackage/JGroundControl/" -Force
+          } else {
+            echo "❌ JGroundControl directory not found"
+            exit 1
+          }
+
       - name: Create Windows release archive
         run: |
           cd build/jpackage
-          Compress-Archive -Path "JGroundControl" -DestinationPath "../JGroundControl-Windows.zip"
+          Compress-Archive -Path "JGroundControl" -DestinationPath "JGroundControl-Windows.zip"
+          Move-Item "JGroundControl-Windows.zip" "../"
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
@@ -84,6 +96,17 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean stageApp jpackageImage
 
+      - name: Verify Linux build output
+        run: |
+          echo "=== Verifying Linux build output ==="
+          if [ -d "build/jpackage/JGroundControl" ]; then
+            echo "✅ JGroundControl directory found"
+            ls -la build/jpackage/JGroundControl/
+          else
+            echo "❌ JGroundControl directory not found"
+            exit 1
+          fi
+
       - name: Create Linux release archive
         run: |
           cd build/jpackage
@@ -121,12 +144,31 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean stageApp jpackageImage
+        run: |
+          echo "Starting Gradle build..."
+          ./gradlew clean stageApp jpackageImage
+          echo "Gradle build completed"
+
+      - name: Verify macOS build output
+        run: |
+          echo "=== Verifying macOS build output ==="
+          if [ -d "build/jpackage/JGroundControl" ]; then
+            echo "✅ JGroundControl directory found"
+            ls -la build/jpackage/JGroundControl/
+          else
+            echo "❌ JGroundControl directory not found in build/jpackage/"
+            echo "Build output:"
+            ls -la build/jpackage/ || echo "jpackage directory does not exist"
+            exit 1
+          fi
 
       - name: Create macOS release archive
         run: |
+          echo "=== Creating macOS release archive ==="
           cd build/jpackage
           tar -czf ../JGroundControl-macOS.tar.gz JGroundControl
+          echo "✅ Archive created successfully"
+          ls -la ../JGroundControl-macOS.tar.gz
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
@@ -137,7 +179,7 @@ jobs:
   create-release:
     needs: [build-windows, build-ubuntu, build-macos]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -147,6 +189,20 @@ jobs:
         with:
           path: artifacts
 
+      - name: Verify all artifacts
+        run: |
+          echo "=== Verifying all build artifacts ==="
+          ls -la artifacts/
+          echo ""
+          echo "Windows artifact:"
+          ls -la artifacts/JGroundControl-Windows/ || echo "Windows artifact missing"
+          echo ""
+          echo "Linux artifact:"
+          ls -la artifacts/JGroundControl-Linux/ || echo "Linux artifact missing"
+          echo ""
+          echo "macOS artifact:"
+          ls -la artifacts/JGroundControl-macOS/ || echo "macOS artifact missing"
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -155,20 +211,20 @@ jobs:
           body: |
             ## JGroundControl Release ${{ github.event.inputs.version || github.ref_name }}
             
-            ### 下载说明
-            - **Windows**: 下载 `JGroundControl-Windows.zip`，解压后运行 `JGroundControl.exe`
-            - **Linux**: 下载 `JGroundControl-Linux.tar.gz`，解压后运行 `./JGroundControl/bin/JGroundControl`
-            - **macOS**: 下载 `JGroundControl-macOS.tar.gz`，解压后运行 `./JGroundControl/bin/JGroundControl`
+            ### Download Instructions
+            - **Windows**: Download `JGroundControl-Windows.zip`, extract and run `JGroundControl.exe`
+            - **Linux**: Download `JGroundControl-Linux.tar.gz`, extract and run `./JGroundControl/bin/JGroundControl`
+            - **macOS**: Download `JGroundControl-macOS.tar.gz`, extract and run `./JGroundControl/bin/JGroundControl`
             
-            ### 系统要求
-            - Java 21 运行时环境
-            - 各平台对应的系统依赖库（详见README.md）
+            ### System Requirements
+            - Java 21 runtime environment
+            - Platform-specific system dependencies (see README.md for details)
             
-            ### 功能特性
-            - 多平台地面站控制软件
-            - 支持串口和网络通信
-            - 多语言界面支持
-            - 参数配置和状态监控
+            ### Features
+            - Multi-platform ground control station software
+            - Serial and network communication support
+            - Multi-language interface support
+            - Parameter configuration and status monitoring
           files: |
             artifacts/JGroundControl-Windows/JGroundControl-Windows.zip
             artifacts/JGroundControl-Linux/JGroundControl-Linux.tar.gz
