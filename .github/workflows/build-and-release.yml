@@ -152,11 +152,11 @@ jobs:
       - name: Verify macOS build output
         run: |
           echo "=== Verifying macOS build output ==="
-          if [ -d "build/jpackage/JGroundControl" ]; then
-            echo "✅ JGroundControl directory found"
-            ls -la build/jpackage/JGroundControl/
+          if [ -d "build/jpackage/JGroundControl.app" ]; then
+            echo "✅ JGroundControl.app found"
+            ls -la build/jpackage/JGroundControl.app/
           else
-            echo "❌ JGroundControl directory not found in build/jpackage/"
+            echo "❌ JGroundControl.app not found in build/jpackage/"
             echo "Build output:"
             ls -la build/jpackage/ || echo "jpackage directory does not exist"
             exit 1
@@ -166,7 +166,7 @@ jobs:
         run: |
           echo "=== Creating macOS release archive ==="
           cd build/jpackage
-          tar -czf ../JGroundControl-macOS.tar.gz JGroundControl
+          tar -czf ../JGroundControl-macOS.tar.gz JGroundControl.app
           echo "✅ Archive created successfully"
           ls -la ../JGroundControl-macOS.tar.gz
 
@@ -214,7 +214,7 @@ jobs:
             ### Download Instructions
             - **Windows**: Download `JGroundControl-Windows.zip`, extract and run `JGroundControl.exe`
             - **Linux**: Download `JGroundControl-Linux.tar.gz`, extract and run `./JGroundControl/bin/JGroundControl`
-            - **macOS**: Download `JGroundControl-macOS.tar.gz`, extract and run `./JGroundControl/bin/JGroundControl`
+            - **macOS**: Download `JGroundControl-macOS.tar.gz`, extract and run `./JGroundControl.app/Contents/MacOS/JGroundControl`
             
             ### System Requirements
             - Java 21 runtime environment
